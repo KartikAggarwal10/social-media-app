@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "seed:demo": "node scripts/seed-demo-data.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.106",

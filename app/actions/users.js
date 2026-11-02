@@ -503,7 +503,17 @@ export async function getFollowRequestsAction(page = 1, limit = 8) {
 // ─── GET SUGGESTED USERS (PAGINATED) ────────────────────────────────────────
 // Smart suggestions based on:
 //   1. Friends of friends (people your following are following)
-//   2. Users who liked or commented on YOUR posts
+//   2. Stable random users from the remaining eligible accounts
+function stableSuggestionHash(value) {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) | 0;
+  }
+
+  return hash;
+}
+
 export async function getSuggestedUsersAction(page = 1, limit = 8) {
   const user_data = await requireUser();
   const userId = user_data.id;
@@ -539,12 +549,51 @@ export async function getSuggestedUsersAction(page = 1, limit = 8) {
 
   // ── Merge & deduplicate, keeping friends-of-friends first (higher relevance)
   const seen = new Set();
-  const mergedIds = [];
+  const friendsOfFriendsIds = [];
 
   // Friends-of-friends get priority
   for (const id of fofIds) {
-    if (!seen.has(id)) { seen.add(id); mergedIds.push(id); }
+    if (!seen.has(id)) {
+      seen.add(id);
+      friendsOfFriendsIds.push(id);
+    }
   }
+
+  // ── Add a stable random segment so pagination does not reshuffle results
+  const randomUserCount = Math.max(1, Math.ceil(limit * 0.1));
+  const randomCandidates = await db.collection("users")
+    .find({
+      userId: {
+        $nin: [...excludeSet, ...friendsOfFriendsIds],
+      },
+    })
+    .project({ userId: 1 })
+    .toArray();
+
+  const daySeed = new Date().toISOString().slice(0, 10);
+  const randomIds = randomCandidates
+    .sort((a, b) => stableSuggestionHash(`${userId}:${daySeed}:${a.userId}`)
+      - stableSuggestionHash(`${userId}:${daySeed}:${b.userId}`))
+    .map(user => user.userId);
+
+  const mergedIds = [];
+  let relevantIndex = 0;
+  let randomIndex = 0;
+
+  while (relevantIndex < friendsOfFriendsIds.length || randomIndex < randomIds.length) {
+    for (let count = 0; count < limit - randomUserCount; count += 1) {
+      if (relevantIndex >= friendsOfFriendsIds.length) break;
+      mergedIds.push(friendsOfFriendsIds[relevantIndex]);
+      relevantIndex += 1;
+    }
+
+    for (let count = 0; count < randomUserCount; count += 1) {
+      if (randomIndex >= randomIds.length) break;
+      mergedIds.push(randomIds[randomIndex]);
+      randomIndex += 1;
+    }
+  }
+
   // ── Paginate the merged result
   const startIndex = (page - 1) * limit;
   const pageIds = mergedIds.slice(startIndex, startIndex + limit);
