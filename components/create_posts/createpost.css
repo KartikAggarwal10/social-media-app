@@ -1,0 +1,242 @@
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 48px clamp(20px, 5vw, 72px);
+  color: #172033;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255, 232, 198, 0.7), transparent 30%),
+    radial-gradient(circle at 100% 12%, rgba(199, 224, 255, 0.7), transparent 28%),
+    #f6f7fb;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto 32px;
+}
+
+.topbar h1 {
+  margin: 0;
+  color: #172033;
+  font-size: clamp(2.2rem, 5vw, 4.1rem);
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+.topbar p {
+  margin: 14px 0 0;
+  color: #637087;
+  font-size: 1.05rem;
+}
+
+.save {
+  min-width: 108px;
+  padding: 11px 16px;
+  color: #48604a;
+  background: #edf7ee;
+  border: 1px solid #d5ecd7;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(43, 62, 50, 0.08);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 28px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.editorSide,
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(218, 224, 234, 0.8);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(36, 48, 73, 0.08);
+}
+
+.editorSide {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 34px);
+}
+
+.title {
+  width: 100%;
+  margin: 0 0 22px;
+  padding: 0;
+  color: #172033;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.title::placeholder,
+.card input::placeholder {
+  color: #9aa5b7;
+  opacity: 1;
+}
+
+.editor {
+  overflow: hidden;
+  border: 1px solid #dfe4ec;
+  border-radius: 16px;
+}
+
+.editor .ql-toolbar.ql-snow {
+  color: #344158;
+  background: #fbfcfe;
+  border: 0;
+  border-bottom: 1px solid #e4e8ef;
+}
+
+.editor .ql-container.ql-snow {
+  height: 520px;
+  border: 0;
+}
+
+.editor .ql-editor {
+  min-height: 520px;
+  padding: 26px;
+  color: #172033;
+  background: #fff;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.editor .ql-editor.ql-blank::before {
+  color: #a4afbf;
+  font-style: normal;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  padding: 22px;
+}
+
+.card h3 {
+  margin: 0 0 14px;
+  color: #172033;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.card input,
+.card select {
+  width: 100%;
+  padding: 13px 14px;
+  color: #172033;
+  background: #fbfcfe;
+  border: 1px solid #dce2eb;
+  border-radius: 12px;
+  outline: 0;
+}
+
+.card input:focus {
+  border-color: #e28d5d;
+  box-shadow: 0 0 0 3px rgba(226, 141, 93, 0.14);
+}
+
+.card input + input,
+.card button + input {
+  margin-top: 12px;
+}
+
+.tagBox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag {
+  padding: 7px 11px;
+  color: #8c4a2d;
+  background: #fff0e8;
+  border-radius: 999px;
+  font-size: 0.82rem;
+}
+
+.publish {
+  padding: 15px 18px;
+  color: #fff;
+  background: #172033;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+}
+
+.publish:hover:not(:disabled) {
+  box-shadow: 0 12px 24px rgba(23, 32, 51, 0.2);
+  transform: translateY(-2px);
+}
+
+.publish.secondary {
+  color: #172033;
+  background: #fff;
+  border: 1px solid #dce2eb;
+}
+
+.publish:disabled,
+.card button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.card button:not(.publish) {
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 14px;
+  color: #fff;
+  background: #df8152;
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .editor .ql-container.ql-snow,
+  .editor .ql-editor {
+    min-height: 420px;
+    height: 420px;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    padding: 28px 14px;
+  }
+
+  .topbar {
+    flex-direction: column;
+  }
+
+  .save {
+    align-self: flex-start;
+  }
+}
