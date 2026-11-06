@@ -1,4 +1,7 @@
 "use client";
+
+// give user data to frontend
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { SessionProvider, signOut } from "next-auth/react";
 
@@ -55,7 +58,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(userName));
 
     // Also set cookie for Server Components & API routes (expires in 30 days)
-    document.cookie = `userId=${id}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+    //document.cookie = `userId=${id}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
   };
 
   // 3. Logout / Clear user
@@ -64,7 +67,7 @@ export function AuthProvider({ children }) {
   setUser(null);
   localStorage.removeItem("userId");
   localStorage.removeItem("user");
-  document.cookie =  "userId=; path=/; max-age=0; SameSite=Lax";
+  //document.cookie =  "userId=; path=/; max-age=0; SameSite=Lax";
   signOut({ callbackUrl: "/login" }); // Add this to clear NextAuth session
 };
 
