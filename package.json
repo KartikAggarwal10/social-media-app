@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:mongodb": "node scripts/migrate-mongodb.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.106",
@@ -19,6 +20,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-quill-new": "^3.8.3",
+    "socket.io-client": "^4.8.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {

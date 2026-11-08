@@ -4,50 +4,78 @@ import { io } from "socket.io-client";
 import { StorechatAction, getChatAction, deleteChatAction } from "../app/actions/users";
 import { useAuth } from "../context/AuthContext";
 
-// Connect to the external socket server
-const socket = io("http://localhost:3001");
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+const socket = io(SOCKET_URL, {
+  autoConnect: true,
+  transports: ["websocket", "polling"],
+});
 
 export default function Chat({ receiverId }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   
-    const { userId, loading } = useAuth()
-    const currentUserId = Number(userId);
+  const { userId, loading } = useAuth();
+  const currentUserId = userId !== null && userId !== undefined ? Number(userId) : null;
+
   useEffect(() => {
     const normalizedReceiverId = Number(receiverId);
     if (loading || !Number.isInteger(currentUserId) || !Number.isInteger(normalizedReceiverId)) {
       return;
     }
 
-    // Load initial chat history
+    // 1. Ensure socket is actually connected
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    // 2. Load initial chat history from MongoDB
     const loadChat = async () => {
       try {
         const history = await getChatAction(normalizedReceiverId);
         setMessages(history);
       } catch (error) {
-        console.error("Failed to load chat:", error);
+        console.error("Failed to load chat history:", error);
       }
     };
     loadChat();
 
-    socket.emit("join", currentUserId);
+    // 3. Join the personal room on connect and whenever active
+    const joinPersonalRoom = () => {
+      socket.emit("join", String(currentUserId));
+    };
 
-    // 2. Listen for incoming messages
-    socket.on("receiveMessage", (data) => {
+    if (socket.connected) {
+      joinPersonalRoom();
+    }
+    socket.on("connect", joinPersonalRoom);
+
+    // 4. Listen for incoming messages routed to our room
+    const handleReceiveMessage = (data) => {
       // Only show the message if it's from the person we are currently looking at
-      if (Number(data.senderId) === normalizedReceiverId) {
-        setMessages((prev) => [...prev, { _id: data._id, type: "received", message: data.message }]);
+      if (String(data.senderId) === String(normalizedReceiverId)) {
+        setMessages((prev) => {
+          // Avoid duplicate messages if already present
+          if (data._id && prev.some((m) => m._id === data._id)) {
+            return prev;
+          }
+          return [...prev, { _id: data._id, type: "received", message: data.message }];
+        });
       }
-    });
+    };
 
-    // Cleanup when component closes
-    return () => socket.off("receiveMessage");
+    socket.on("receiveMessage", handleReceiveMessage);
+
+    // 5. Cleanup listeners on unmount
+    return () => {
+      socket.off("connect", joinPersonalRoom);
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
   }, [currentUserId, loading, receiverId]);
 
   const handleSend = async () => {
     if (!text.trim()) return;
     const msgText = text;
-    setText("");
+    setText(""); // Clear UI immediately for smooth UX
 
     try {
       const normalizedReceiverId = Number(receiverId);
@@ -58,12 +86,12 @@ export default function Chat({ receiverId }) {
 
       socket.emit("sendMessage", {
         _id: messageId,
-        senderId: currentUserId,
-        receiverId: normalizedReceiverId,
-        message: msgText
+        senderId: String(currentUserId),
+        receiverId: String(normalizedReceiverId),
+        message: msgText,
       });
     } catch (error) {
-      setText(msgText);
+      setText(msgText); // Restore input if failed
       console.error("Failed to send message:", error);
     }
   };
@@ -73,7 +101,7 @@ export default function Chat({ receiverId }) {
     
     try {
       await deleteChatAction(Number(receiverId), messageId);
-      setMessages((prev) => prev.filter(m => m._id !== messageId));
+      setMessages((prev) => prev.filter((m) => m._id !== messageId));
     } catch (error) {
       console.error("Failed to delete message:", error);
     }

@@ -100,7 +100,7 @@ export default function PostCard({ post: rawPost }) {
 
   const { messages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
-            api: '/api/chtbot',
+            api: '/api/chat_bot',
         }),
     })
 

@@ -20,6 +20,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## MongoDB configuration
+
+Copy `.env.example` to `.env.local` and set `MONGODB_URI` to the MongoDB
+connection string for the cluster that should store the application data.
+`MONGODB_DB` defaults to `social_media`.
+
+To safely copy the local `social_media` database to another cluster, set
+`TARGET_MONGODB_URI` and optionally `TARGET_MONGODB_DB`, then run:
+
+```bash
+npm run migrate:mongodb
+```
+
+This performs a dry run. Add `-- --execute` to copy the data. The migration
+upserts documents by `_id`, replaces matching target documents with the source
+version, and never deletes target-only documents.
+
 ## Demo data
 
 The opt-in seed command creates 20 demo users and 25 demo posts in the local

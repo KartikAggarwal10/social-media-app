@@ -14,3 +14,14 @@ see and understand how it made graphs in dashboard
 page to display followers,followed,requests
 - change dp
 users display
+
+
+
+
+
+
+
+
+remove unwannted files
+host socket
+host website
