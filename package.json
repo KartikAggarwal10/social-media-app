@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "migrate:mongodb": "node scripts/migrate-mongodb.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.106",
