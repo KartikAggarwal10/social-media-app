@@ -1,24 +1,31 @@
 {
-  "name": "my-pp",
-  "version": "0.1.0",
+  "name": "new_socil_medi_pp",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "socket": "node socket-server.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.106",
+    "@ai-sdk/react": "^4.0.16",
+    "@reduxjs/toolkit": "^2.11.2",
     "ai": "^7.0.158",
     "bcryptjs": "^3.0.3",
+    "groq": "^6.3.0",
     "groq-sdk": "^1.6.0",
+    "lucide-react": "^1.14.0",
     "mongodb": "^7.6.0",
     "next": "16.2.6",
     "next-auth": "^4.24.15",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-quill": "^2.0.0",
     "react-quill-new": "^3.8.3",
+    "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.4",
     "zod": "^4.6.7"
   },
