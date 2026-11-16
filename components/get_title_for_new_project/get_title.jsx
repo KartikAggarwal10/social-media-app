@@ -11,7 +11,6 @@ export default function GetTitleModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const { userId } = useAuth();
   const router = useRouter();
-  console.log("-->" + userId)
   if (!isOpen) return null;
 
   async function handleCreatePost(e) {
