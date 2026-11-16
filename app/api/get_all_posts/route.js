@@ -12,9 +12,13 @@ export async function GET(req) {
         const page = parseInt(url.searchParams.get("page")) || 1;
         const limit = parseInt(url.searchParams.get("limit")) || 10;
         console.log("to query " + search+ " " + category )
-          const user_data = await requireUser();
-          console.log("to check is : " + user_data.userId)
-          const userId = user_data.id
+        let user_data = null;
+        try {
+          user_data = await requireUser();
+        } catch {
+          // Public browsing fallback if session is not available
+        }
+        const userId = user_data ? (user_data.userId ?? user_data.id) : null;
         // Build query
         const query = {};
         if (search) {
@@ -73,9 +77,7 @@ export async function GET(req) {
 
         // 7. Merge them together
         let combined = [...personalized, ...trending, ...normal];
-        combined = combined.filter((i) => {
-            i.status === "published"
-        })
+        combined = combined.filter((i) => i.status === "published");
         // 8. Remove any duplicates (in case a trending post is also a personalized one)
         const uniquePosts = Array.from(new Map(combined.map(p => [p.postId, p])).values());
 

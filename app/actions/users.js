@@ -50,7 +50,8 @@ export async function changeDp(id) {
   const db = await connectDB();
   await db.collection("users").updateOne({userId:userId},{$set:{dp : id}})
 }
-export async function updateBioAction(userId,bio){
+export async function updateBioAction(bio){
+  const userId = await requireUser()
   const db = await connectDB();
   await db.collection("users").updateOne({userId:userId},{$set:{bio:bio}})
 }

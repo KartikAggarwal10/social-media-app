@@ -6,14 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "migrate:mongodb": "node scripts/migrate-mongodb.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.106",
+    "@ai-sdk/react": "^4.0.16",
     "ai": "^7.0.158",
     "bcryptjs": "^3.0.3",
     "groq-sdk": "^1.6.0",
+    "lucide-react": "^1.14.0",
     "mongodb": "^7.6.0",
     "next": "16.2.6",
     "next-auth": "^4.24.15",
