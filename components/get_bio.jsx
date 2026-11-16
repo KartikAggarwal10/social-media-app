@@ -19,6 +19,7 @@ export default function GetBioModal({ isOpen, onClose }) {
       setError("Please write something for your bio.");
       return;
     }
+    
     if (userId === null || userId === undefined) {
       setError("User session not found. Please log in first.");
       return;

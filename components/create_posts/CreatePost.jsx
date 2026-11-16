@@ -26,18 +26,41 @@ export default function CreatePost({ data }) {
   const [searchTerm, setsearchTerm] = useState("");
   const [ailoading, setAiLoading] = useState(false);
 
-  async function drft() {
-    setSaving(true);
-    setstatus("");
-    try {
-      await saveDraftAction({ postId: data.postId, content, title, category, tags, cover });
-      setstatus("Draft saved");
-    } catch (err) {
-      setstatus(`Draft save failed: ${err.message}`);
-    } finally {
-      setSaving(false);
-    }
+async function drft() {
+  setSaving(true);
+  setstatus("");
+  try {
+    const res = await fetch("/api/draft_posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: data.postId, content, title, category, tags, cover }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error || "Save failed");
+    setstatus("Draft saved");
+  } catch (err) {
+    setstatus(`Draft save failed: ${err.message}`);
+  } finally {
+    setSaving(false);
   }
+}
+
+async function Save() {
+  setSaving(true);
+  setstatus("");
+  try {
+    const res = await fetch("/api/publish_posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: data.postId, content, title, category, tags, cover }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error || "Publish failed");
+    setstatus("Published");
+  } catch (err) {
+    setstatus(`Publish failed: ${err.message}`);
+  } finally {
+    setSaving(false);
+  }
+}
 const handleAiGenerate = async () => {
   if (!userPrompt.trim()) {
     setAiResponse("Tell me what you want help with first.");
@@ -118,18 +141,6 @@ const handleAiGenerate = async () => {
     }
   };
 
-  async function Save() {
-    setSaving(true);
-    setstatus("");
-    try {
-      await publishPostAction({ postId: data.postId, content, title, category, tags, cover });
-      setstatus("Published");
-    } catch (err) {
-      setstatus(`Publish failed: ${err.message}`);
-    } finally {
-      setSaving(false);
-    }
-  }
   const postCoverHandler = async (file) => {
     if (!file) return;
     const fd = new FormData();

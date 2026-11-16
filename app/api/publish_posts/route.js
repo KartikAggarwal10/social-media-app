@@ -64,30 +64,34 @@ const DEFAULT_BLOG_COVERS = {
     "https://images.unsplash.com/photo-1503264116251-35a269479413?w=1200&q=80",
 };
 export async function POST(req) {
-  const db = await connectDB();
-  const { postId } = await req.json();
-  const post = await db.collection("posts").findOne({
-    $or: [{ postId: postId }, { PostId: postId }, { postId: Number(postId) }]
-  });
-  if (!post) {
-    return Response.json({ error: "Post not found" }, { status: 404 });
-  }
-  let finalCover = post.cover;
-  if (!finalCover || finalCover.trim() === "") {
-    const cat = (post.category || post.categories || "").toLowerCase().trim();
-    finalCover = DEFAULT_BLOG_COVERS[cat] || DEFAULT_BLOG_COVERS["default"];
-  }
-  await db.collection("posts").updateOne(
-    { $or: [{ postId: postId }, { PostId: postId }, { postId: Number(postId) }] },
-    {
-      $set: {
-        cover: finalCover,
-        status: "published",
-        likes: post.likes || 0,
-        comments: post.comments || [],
-        publishedAt: new Date(),
-      }
+  try {
+    const { postId, content, title, category, tags, cover } = await req.json();
+    // 1. Save draft first
+    const db = await connectDB();
+    await db.collection("posts").updateOne(
+      { $or: [{ postId }, { postId: Number(postId) }] },
+      { $set: { content, title, category, cover, tags } }
+    );
+    // 2. Find post
+    const post = await db.collection("posts").findOne({
+      $or: [{ postId }, { postId: Number(postId) }],
+    });
+    if (!post) return Response.json({ error: "Post not found" }, { status: 404 });
+    // 3. Assign cover
+    let finalCover = cover || post.cover;
+    if (!finalCover || finalCover.trim() === "") {
+      const cat = (category || post.category || "").toLowerCase().trim();
+      finalCover = DEFAULT_BLOG_COVERS[cat] || DEFAULT_BLOG_COVERS["default"];
     }
-  );
-  return Response.json({ success: true, cover: finalCover });
+    // 4. Publish
+    await db.collection("posts").updateOne(
+      { $or: [{ postId }, { postId: Number(postId) }] },
+      { $set: { cover: finalCover, status: "published", publishedAt: new Date() } }
+    );
+    revalidatePath("/");
+    return Response.json({ success: true, cover: finalCover });
+  } catch (err) {
+    console.error("Publish error:", err);
+    return Response.json({ error: err.message }, { status: 500 });
+  }
 }
