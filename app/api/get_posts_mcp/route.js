@@ -24,6 +24,15 @@ export async function GET(req) {
         if (author) {
             filter.userId = author;
         }
+        else {
+             return Response.json(
+                {
+                    success: false,
+                    error: "userId required"
+                },
+                { status: 400 }
+            );
+        }
 
         const posts = await db
             .collection("posts")

@@ -13,19 +13,27 @@ export async function POST(request) {
             published
         } = await request.json();
 
-        console.log(
-            "came",
-            user_id,
-            title,
-            content,
-            tags,
-            category,
-            cover
-        );
-
+        // console.log(
+        //     "came",
+        //     user_id,
+        //     title,
+        //     content,
+        //     tags,
+        //     category,
+        //     cover
+        // );
+        if(!user_id || !title || !category) {
+            return Response.json(
+                    {
+                        success: false,
+                        error: "userId and adminId are required"
+                    },
+                    { status: 400 }
+                );
+        }
         const data = await createPostAction(user_id, title);
 
-        console.log("came2", data);
+        //console.log("came2", data);
 
         await publishPostAction(
             data.postId,

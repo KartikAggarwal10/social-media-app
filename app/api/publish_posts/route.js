@@ -1,4 +1,14 @@
 import { connectDB } from "../../../lib/mongodb"; 
+
+// Allow up to 10 MB request body for large post content
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};
+
 const DEFAULT_BLOG_COVERS = {
   technology:
     "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
