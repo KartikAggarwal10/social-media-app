@@ -6,11 +6,11 @@ const nextConfig: NextConfig = {
     },
   },
   // Raise the body-size limit for all API routes (covers draft & publish)
-  api: {
-    bodyParser: {
-      sizeLimit: "10mb",
-    },
-  },
+  // api: {
+  //   bodyParser: {
+  //     sizeLimit: "10mb",
+  //   },
+  // },
   images: {
     remotePatterns: [
       {
